@@ -1,16 +1,16 @@
 #!/bin/bash
 
 #change into accr 
-echo "Starting OpenStack AIO Provision Script"
+echo "Starting OpenStack All-In-One Provision Script"
 cd /home/vagrant/devstack
 source accrc/admin/admin
 
  
 #download ubuntu  image
 echo "Downloading Ubuntu Image"
-# mkdir -p data/images
+mkdir -p data/images
 cd data/images
-# wget https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img
+wget https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img
 
 
 #upload image to glance 
@@ -45,7 +45,6 @@ touch /home/vagrant/devstack/accrc/admin/sat.rc
 cat > /home/vagrant/devstack/accrc/admin/sat.rc<< EOF
 # OpenStack USER ID = d0172a53f81d4e00a40437a820f2fa4c
 export OS_USERNAME="satoshi"
-# OpenStack project ID = 6ca014f9d41e416090bc2c19a350362b
 export OS_PROJECT_NAME="ohio_super_computing"
 export OS_AUTH_URL="http://10.1.0.10/identity"
 export OS_CACERT=""
@@ -57,9 +56,9 @@ unset OS_USER_DOMAIN_NAME
 unset OS_PROJECT_DOMAIN_NAME
 EOF
 
- #create private network
- echo creating private/internal network for project  
- openstack network create Finney 
+#create private network
+echo creating private/internal network for project  
+openstack network create Finney 
 
  #create private subnet 
 openstack subnet create HalNet --allocation-pool \
