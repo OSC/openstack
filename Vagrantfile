@@ -7,18 +7,20 @@
 # SCRIPT
 
 $script = <<-SCRIPT
-echo beginning script
-DEBIAN_FRONTEND=noninteractive apt-get update
-echo finished updating cache 
-echo beginning pip installations
-DEBIAN_FRONTEND=noninteractive apt-get install -yes python-pip
-echo updated cache and installed pip 
+echo beginning updating package manager >> /vagrant/script.log
+DEBIAN_FRONTEND=noninteractive apt-get update >> /vagrant/script.log
+echo beginning Finished updating package manager >> /vagrant/script.log
+echo beginning pip installations >> /vagrant/script.log
+#DEBIAN_FRONTEND=noninteractive apt-get -y install python3-pip >> /vagrant/script.log
+DEBIAN_FRONTEND=noninteractive apt-get -y -o  Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install  python3-pip >> /vagrant/script.log
+echo installed pip 2  >> /vagrant/script.log
 SCRIPT
 
 Vagrant.configure(2) do |config|
 
-  config.vm.box = "ubuntu/xenial64"
-
+  # config.vm.box = "ubuntu/xenial64"
+  config.vm.box = "bento/ubuntu-16.04"
+  config.vm.box_version = "201906.18.0"
   machines = {
     'controller.devstack.osc'    => { :ip => '10.1.0.10', :memory => "8192", :cpus => "2"},
     'ood.devstack.osc'    => { :ip =>'10.1.0.20', :memory => "1024", :cpus => "1"}
@@ -29,9 +31,8 @@ Vagrant.configure(2) do |config|
   config.hostmanager.manage_guest = true
   config.hostmanager.ignore_private_ip = false
   config.hostmanager.include_offline = true
-  config.ssh.pty = true
+  #config.ssh.pty = true
   # config.ssh.insert_key = false
-  # config.ssh.private_key_path = File.expand_path('/root/.ssh/id_rsa')
 
   machines.each do | hostname, attrs|
     config.vm.define hostname do |machine|
@@ -51,9 +52,10 @@ Vagrant.configure(2) do |config|
         machine.vm.provision "ansible_local" do |ans|
           #ans.limit = "controller.devstack.osc"
           ans.playbook = "vagrant_playbook.yml"
-          ans.install_mode = "pip"
           ans.verbose = true
           ans.install = true 
+          ans.pip_install_cmd = "curl https://bootstrap.pypa.io/get-pip.py | sudo python"
+          # ans.install_mode = "pip"
         end
       end
     end
